@@ -1,0 +1,1 @@
+BUILD_LIB=1 pip install ssdeep
