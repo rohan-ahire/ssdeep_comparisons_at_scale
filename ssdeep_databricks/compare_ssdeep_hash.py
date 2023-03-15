@@ -137,3 +137,35 @@ def compare_ssdeep_optimized_v2(spark, df1, df2):
     ).toDF(["r1_ssdeep_hash", "r2_ssdeep_hash", "score"])
 
     return df
+
+
+# function to compare ssdeep hashes using all possible comparisons (brute force)
+def compare_ssdeep_all_combinations(df1, df2):
+    df1.createOrReplaceTempView("df1")
+    df2.createOrReplaceTempView("df2")
+
+    df = spark.sql(
+        """
+        select
+        r1.ssdeep_hash as r1_ssdeep_hash,
+        r2.ssdeep_hash as r2_ssdeep_hash
+        from df1 r1
+        cross join df2 r2
+        where
+        r1.ssdeep_hash != r2.ssdeep_hash
+  """
+    )
+
+    df = df.rdd.map(
+        lambda x: Row(
+            x["r1_ssdeep_hash"],
+            x["r2_ssdeep_hash"],
+            ssdeep.compare(x["r1_ssdeep_hash"], x["r2_ssdeep_hash"]),
+        )
+    ).toDF(["r1_ssdeep_hash", "r2_ssdeep_hash", "score"])
+
+    return df
+
+def calculate_binned_counts(df, score_column):
+  binned_counts = df.selectExpr(f"int({score_column}/10)*10 as bin").groupBy("bin").count()
+  return binned_counts
