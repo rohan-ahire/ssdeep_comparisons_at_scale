@@ -16,8 +16,7 @@ from ssdeep_databricks.transform import get_transformed_ssdeep_hash
 
 # COMMAND ----------
 
-search_df = spark.createDataFrame([['-1', '3:Dblm1slM4REmKDY/JO/k8KCXRsi/eSLcKoQC0pHk9CEvltlWlVlkll6xU/lX:c1sW4y18O/4i2KoQRE8sf0+loxcX']], ['id', 'ssdeep_hash'])
-search_df = get_transformed_ssdeep_hash(search_df)
+search_df = spark.read.table("rohan.ssdeep_hash_values_transformed_v2").limit(100)
 display(search_df)
 
 # COMMAND ----------
