@@ -27,7 +27,12 @@ display(hash_df)
 
 # COMMAND ----------
 
-display(compare_ssdeep_optimized(spark, hash_df, search_df))
+result = compare_ssdeep_optimized(spark, hash_df, search_df)
+result.count()
+
+# COMMAND ----------
+
+display(result)
 
 # COMMAND ----------
 
