@@ -36,13 +36,4 @@ display(result)
 
 # COMMAND ----------
 
-result = compare_ssdeep_optimized_v2(spark, hash_df, search_df)
-result.count()
-
-# COMMAND ----------
-
-display(result)
-
-# COMMAND ----------
-
 

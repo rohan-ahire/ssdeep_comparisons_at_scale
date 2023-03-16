@@ -16,7 +16,7 @@ from ssdeep_databricks.transform import get_transformed_ssdeep_hash
 
 # COMMAND ----------
 
-search_df = spark.read.table("rohan.ssdeep_hash_values_transformed_v2").limit(100)
+search_df = spark.read.table("rohan.ssdeep_hash_values_transformed_v2").limit(1000)
 display(search_df)
 
 # COMMAND ----------
@@ -27,15 +27,6 @@ display(hash_df)
 # COMMAND ----------
 
 result = compare_ssdeep_optimized(spark, hash_df, search_df)
-result.count()
-
-# COMMAND ----------
-
-display(result)
-
-# COMMAND ----------
-
-result = compare_ssdeep_optimized_v2(spark, hash_df, search_df)
 result.count()
 
 # COMMAND ----------
