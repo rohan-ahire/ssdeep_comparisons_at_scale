@@ -172,6 +172,9 @@ def calculate_binned_counts(df, score_column):
 
 
 def compare_ssdeep_explode_and_join(spark, a, b, df1, df2):
+    df1.createOrReplaceTempView("df1")
+    df2.createOrReplaceTempView("df2")
+
     result_df = spark.sql("""
         select
         t.r1_ssdeep_hash,
