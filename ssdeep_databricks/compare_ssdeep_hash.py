@@ -175,7 +175,7 @@ def compare_ssdeep_explode_and_join(spark, a, b, df1, df2):
     df1.createOrReplaceTempView("df1")
     df2.createOrReplaceTempView("df2")
 
-    result_df = spark.sql("""
+    result_df = spark.sql(f"""
         select
         t.r1_ssdeep_hash,
         t.r2_ssdeep_hash
@@ -186,7 +186,7 @@ def compare_ssdeep_explode_and_join(spark, a, b, df1, df2):
             r1.ssdeep_hash as r1_ssdeep_hash,
             r2.ssdeep_hash as r2_ssdeep_hash
             from
-            a r1
+            {a} r1
             inner join df1 r2 on r1.chunksize = r2.chunksize
             and r1.ngram_chunk_output_exploded = r2.ngram_chunk_output_exploded
             union
@@ -195,7 +195,7 @@ def compare_ssdeep_explode_and_join(spark, a, b, df1, df2):
             r1.ssdeep_hash as r1_ssdeep_hash,
             r2.ssdeep_hash as r2_ssdeep_hash
             from
-            b r1
+            {b} r1
             inner join df2 r2 on r1.chunksize = r2.chunksize
             and r1.ngram_double_chunk_output_exploded = r2.ngram_double_chunk_output_exploded
             union
@@ -204,7 +204,7 @@ def compare_ssdeep_explode_and_join(spark, a, b, df1, df2):
             r1.ssdeep_hash as r1_ssdeep_hash,
             r2.ssdeep_hash as r2_ssdeep_hash
             from
-            a r1
+            {a} r1
             inner join df2 r2 on r1.chunksize = r2.chunksize * 2
             and r1.ngram_chunk_output_exploded = r2.ngram_double_chunk_output_exploded
         ) t 
