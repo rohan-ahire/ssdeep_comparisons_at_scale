@@ -169,3 +169,50 @@ def compare_ssdeep_all_combinations(df1, df2):
 def calculate_binned_counts(df, score_column):
   binned_counts = df.selectExpr(f"int({score_column}/10)*10 as bin").groupBy("bin").count()
   return binned_counts
+
+
+def compare_ssdeep_explode_and_join(spark, a, b, s1, s2):
+    result_df = spark.sql("""
+        select
+        t.r1_ssdeep_hash,
+        t.r2_ssdeep_hash
+        from
+        (
+            select
+            /*+  BROADCASTJOIN(r2) */
+            r1.ssdeep_hash as r1_ssdeep_hash,
+            r2.ssdeep_hash as r2_ssdeep_hash
+            from
+            hive_metastore.rohan.ssdeep_hash_integer_values_chunk_exploded r1
+            inner join df1 r2 on r1.chunksize = r2.chunksize
+            and r1.ngram_chunk_output_exploded = r2.ngram_chunk_output_exploded
+            union
+            select
+            /*+  BROADCASTJOIN(r2) */
+            r1.ssdeep_hash as r1_ssdeep_hash,
+            r2.ssdeep_hash as r2_ssdeep_hash
+            from
+            hive_metastore.rohan.ssdeep_hash_integer_values_double_chunk_exploded r1
+            inner join df2 r2 on r1.chunksize = r2.chunksize
+            and r1.ngram_double_chunk_output_exploded = r2.ngram_double_chunk_output_exploded
+            union
+            select
+            /*+  BROADCASTJOIN(r2) */
+            r1.ssdeep_hash as r1_ssdeep_hash,
+            r2.ssdeep_hash as r2_ssdeep_hash
+            from
+            hive_metastore.rohan.ssdeep_hash_integer_values_chunk_exploded r1
+            inner join df2 r2 on r1.chunksize = r2.chunksize * 2
+            and r1.ngram_chunk_output_exploded = r2.ngram_double_chunk_output_exploded
+        ) t 
+        """)
+
+    result_df = result_df.rdd.map(
+            lambda x: Row(
+                x["r1_ssdeep_hash"],
+                x["r2_ssdeep_hash"],
+                int(ssdeep.compare(x["r1_ssdeep_hash"], x["r2_ssdeep_hash"])),
+            )
+        ).toDF(["r1_ssdeep_hash", "r2_ssdeep_hash", "score"])    
+    
+    return result_df
