@@ -171,7 +171,7 @@ def calculate_binned_counts(df, score_column):
   return binned_counts
 
 
-def compare_ssdeep_explode_and_join(spark, a, b, s1, s2):
+def compare_ssdeep_explode_and_join(spark, a, b, df1, df2):
     result_df = spark.sql("""
         select
         t.r1_ssdeep_hash,
@@ -183,7 +183,7 @@ def compare_ssdeep_explode_and_join(spark, a, b, s1, s2):
             r1.ssdeep_hash as r1_ssdeep_hash,
             r2.ssdeep_hash as r2_ssdeep_hash
             from
-            hive_metastore.rohan.ssdeep_hash_integer_values_chunk_exploded r1
+            a r1
             inner join df1 r2 on r1.chunksize = r2.chunksize
             and r1.ngram_chunk_output_exploded = r2.ngram_chunk_output_exploded
             union
@@ -192,7 +192,7 @@ def compare_ssdeep_explode_and_join(spark, a, b, s1, s2):
             r1.ssdeep_hash as r1_ssdeep_hash,
             r2.ssdeep_hash as r2_ssdeep_hash
             from
-            hive_metastore.rohan.ssdeep_hash_integer_values_double_chunk_exploded r1
+            b r1
             inner join df2 r2 on r1.chunksize = r2.chunksize
             and r1.ngram_double_chunk_output_exploded = r2.ngram_double_chunk_output_exploded
             union
@@ -201,7 +201,7 @@ def compare_ssdeep_explode_and_join(spark, a, b, s1, s2):
             r1.ssdeep_hash as r1_ssdeep_hash,
             r2.ssdeep_hash as r2_ssdeep_hash
             from
-            hive_metastore.rohan.ssdeep_hash_integer_values_chunk_exploded r1
+            a r1
             inner join df2 r2 on r1.chunksize = r2.chunksize * 2
             and r1.ngram_chunk_output_exploded = r2.ngram_double_chunk_output_exploded
         ) t 
