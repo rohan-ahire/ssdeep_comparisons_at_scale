@@ -50,7 +50,7 @@ def get_query_for_optimized_ssdeep_compare(df1: str, df2: str) -> str:
         where
         size(t.intersect_chunk) > 0
         or size(t.intersect_double_chunk) > 0
-        and r1.ssdeep_hash != r2.ssdeep_hash
+        and t.r1_ssdeep_hash != t.r2_ssdeep_hash
         union
         select
         t.r1_ssdeep_hash,
@@ -165,6 +165,15 @@ def get_query_to_compare_ssdeep_using_explode_and_join(a: str, b: str, c: str, d
             {a} r1
             inner join {d} r2 on r1.chunksize = r2.chunksize * 2
             and r1.ngram_chunk_output_exploded = r2.ngram_double_chunk_output_exploded
+            union
+            select
+            /*+  BROADCASTJOIN(r2) */
+            r1.ssdeep_hash as r1_ssdeep_hash,
+            r2.ssdeep_hash as r2_ssdeep_hash
+            from
+            {b} r1
+            inner join {c} r2 on r1.chunksize = r2.chunksize / 2
+            and r1.ngram_double_chunk_output_exploded = r2.ngram_chunk_output_exploded
         ) t 
         """
 
