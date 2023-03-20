@@ -2,8 +2,8 @@ import ssdeep
 import pandas as pd
 from pyspark.sql.functions import pandas_udf, PandasUDFType
 
-@pandas_udf(returnType=pd.Series(dtype='int'), functionType=PandasUDFType.SCALAR)
-def ssdeep_compare(hash1: pd.Series, hash2: pd.Series) -> int:
+@pandas_udf('int', PandasUDFType.SCALAR)
+def ssdeep_compare(hash1: pd.Series, hash2: pd.Series) -> pd.Series:
     """
     Compare two ssdeep hashes using the ssdeep library.
 
