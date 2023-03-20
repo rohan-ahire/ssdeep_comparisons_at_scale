@@ -1,14 +1,34 @@
+import ssdeep
 import pandas as pd
 from pyspark.sql.functions import pandas_udf, PandasUDFType
 
 
 @pandas_udf('int', PandasUDFType.SCALAR)
 def ssdeep_compare(hash1: pd.Series, hash2: pd.Series) -> pd.Series:
+    """
+    Compare two ssdeep hashes using the ssdeep library.
+
+    Parameters:
+    hash1 (pandas.Series): Series of ssdeep hashes
+    hash2 (pandas.Series): Series of ssdeep hashes
+
+    Returns:
+    pandas.Series: Series of integer values, with the result of comparing the two hashes.
+    """
     return hash1.combine(hash2, lambda h1, h2: int(ssdeep.compare(h1, h2)))
 
 
-# function to compare ssdeep hashes in an optimized way
-def get_query_for_optimized_ssdeep_compare(df1, df2):
+def get_query_for_optimized_ssdeep_compare(df1: str, df2: str) -> str:
+    """
+    Generate SQL query to compare ssdeep hashes in an optimized way.
+
+    Parameters:
+    df1 (str): The name of the first DataFrame to compare.
+    df2 (str): The name of the second DataFrame to compare.
+
+    Returns:
+    str: The SQL query to compare ssdeep hashes in an optimized way.
+    """
 
     query = f"""
         select
@@ -74,8 +94,17 @@ def get_query_for_optimized_ssdeep_compare(df1, df2):
     return query
 
 
-# function to compare ssdeep hashes using all possible comparisons (brute force)
-def get_query_ssdeep_all_possible_comparisons(df1, df2):
+def get_query_ssdeep_all_possible_comparisons(df1: str, df2: str) -> str:
+    """
+    Generate SQL query to compare ssdeep hashes using all possible comparisons (brute force).
+
+    Parameters:
+    df1 (str): The name of the first DataFrame to compare.
+    df2 (str): The name of the second DataFrame to compare.
+
+    Returns:
+    str: The SQL query to compare ssdeep hashes using all possible comparisons (brute force).
+    """
 
     query = f"""
         select
@@ -89,7 +118,19 @@ def get_query_ssdeep_all_possible_comparisons(df1, df2):
     return query
 
 
-def compare_ssdeep_explode_and_join(a, b, c, d):
+def get_query_to_compare_ssdeep_using_explode_and_join(a: str, b: str, c: str, d: str) -> str:
+    """
+    Generate SQL query to compare ssdeep hashes using explode and join.
+
+    Parameters:
+    a (str): The name of the dataframe containing exploded values for chunk
+    b (str): The name of the dataframe containing exploded values for double chunk.
+    c (str): The name of the dataframe containing exploded values for chunk values for the ssdeep hashes you want to compare.
+    d (str): The name of the dataframe containing exploded values for double chunk values for the ssdeep hashes you want to compare.
+
+    Returns:
+    str: The SQL query to compare ssdeep hashes using explode and join.
+    """
 
     query = f"""
         select
