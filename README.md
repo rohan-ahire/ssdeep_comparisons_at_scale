@@ -47,7 +47,7 @@ The wheel file will be created in the `dist` folder.
 Upload the wheel file to a location accessible by your Databricks cluster, such as DBFS, S3, or Azure Blob Storage.
 
 ### 4. Create the Cluster Init Script
-Copy the cluster init script named `install_ssdeep.sh` to dbfs
+Copy the cluster init script named [install_ssdeep.sh](./install_ssdeep.sh) to dbfs
 
 ### 5. Create databricks cluster
 Create a new cluster or edit an existing one, and follow these steps:
@@ -59,25 +59,23 @@ Create a new cluster or edit an existing one, and follow these steps:
 ## Usage
 This package contains four notebooks, which demonstrate different use cases for working with ssdeep hashes. These notebooks can be found in the notebooks folder of the repository.
 
-1. Transform ssdeep_hash to list of integers
+1. **Transform ssdeep_hash to list of integers** - 
 This notebook demonstrates how to transform an ssdeep hash into a list of integers for chunk and double chunk. Follow the instructions and code samples provided in the notebook to preprocess ssdeep hashes for further analysis.
 
 Notebook: [transform_ssdeep_hash.py](./notebooks/transform_ssdeep_hash.py)
 
 
-2. Single Value Lookup
+2. **Single Value Lookup** - 
 This notebook demonstrates how to compare a given ssdeep hash with a master table of transformed ssdeep hashes using an optimized methodology for large-scale comparisons, as referenced in this Virus Bulletin article. The output will be a list of comparison results between the input hash and relevant hashes from the master table.
 
 Notebook: [single_value_lookup.py](./notebooks/single_value_lookup.py)
 
-3. Multi Value Lookup
+3. **Multi Value Lookup** - 
 This notebook extends the single value lookup functionality to support multiple input ssdeep hashes in the form of a table. It demonstrates how to efficiently compare multiple input ssdeep hashes with a master table of transformed ssdeep hashes.
 
 Notebook: [multi_value_lookup.py](./notebooks/multi_value_lookup.py)
 
-4. Testing Accuracy and Completeness
+4. **Testing Accuracy and Completeness** - 
 This notebook demonstrates how to test the accuracy and completeness of the ssdeep comparisons. It compares the single value lookup methodology with a brute-force approach that performs a cross join between the input ssdeep hash and all ssdeep hashes in the database. The output consists of a comparison between the two methods, ensuring that all comparison results with a score greater than 0 are accurately captured. See the testing section of the below notebook.
 
 Notebook: [single_value_lookup.py](./notebooks/single_value_lookup.py)
-
-To use these notebooks, simply open them in your preferred environment (e.g., Jupyter Notebook, JupyterLab, Databricks, or Google Colab) and follow the instructions provided within each notebook. Make sure to install the required package and its dependencies, as described in the Installation section.
