@@ -32,7 +32,7 @@ The key features of this project include:
 
 ### 1. Clone the Repository
 ```
-git clone https://github.com/rohan-ahire/ssdeep_comparisons_at_scale.git`
+git clone https://github.com/rohan-ahire/ssdeep_comparisons_at_scale.git
 cd ssdeep_comparisons_at_scale
 ```
 
@@ -68,16 +68,16 @@ Notebook: [transform_ssdeep_hash.py](./notebooks/transform_ssdeep_hash.py)
 2. Single Value Lookup
 This notebook demonstrates how to compare a given ssdeep hash with a master table of transformed ssdeep hashes using an optimized methodology for large-scale comparisons, as referenced in this Virus Bulletin article. The output will be a list of comparison results between the input hash and relevant hashes from the master table.
 
-Notebook: single_value_lookup.ipynb
+Notebook: [single_value_lookup.py](./notebooks/single_value_lookup.py)
 
 3. Multi Value Lookup
 This notebook extends the single value lookup functionality to support multiple input ssdeep hashes in the form of a table. It demonstrates how to efficiently compare multiple input ssdeep hashes with a master table of transformed ssdeep hashes.
 
-Notebook: multi_value_lookup.ipynb
+Notebook: [multi_value_lookup.py](./notebooks/multi_value_lookup.py)
 
 4. Testing Accuracy and Completeness
-This notebook demonstrates how to test the accuracy and completeness of the ssdeep comparisons. It compares the single value lookup methodology with a brute-force approach that performs a cross join between the input ssdeep hash and all ssdeep hashes in the database. The output consists of a comparison between the two methods, ensuring that all comparison results with a score greater than 0 are accurately captured.
+This notebook demonstrates how to test the accuracy and completeness of the ssdeep comparisons. It compares the single value lookup methodology with a brute-force approach that performs a cross join between the input ssdeep hash and all ssdeep hashes in the database. The output consists of a comparison between the two methods, ensuring that all comparison results with a score greater than 0 are accurately captured. See the testing section of the below notebook.
 
-Notebook: testing_accuracy_completeness.ipynb
+Notebook: [single_value_lookup.py](./notebooks/single_value_lookup.py)
 
 To use these notebooks, simply open them in your preferred environment (e.g., Jupyter Notebook, JupyterLab, Databricks, or Google Colab) and follow the instructions provided within each notebook. Make sure to install the required package and its dependencies, as described in the Installation section.
