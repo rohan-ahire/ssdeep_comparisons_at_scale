@@ -3,22 +3,39 @@ from pyspark.sql.types import IntegerType
 import pyspark.sql.functions as F
 import base64
 from struct import unpack
+import pandas as pd
+from pyspark.sql.types import StringType, IntegerType, ArrayType, LongType, StructField, StructType
+from pyspark.sql.functions import col, pandas_udf, PandasUDFType
+
+# Update the schema for the UDF return type
+result_schema = StructType([
+    StructField("chunksize", IntegerType(), nullable=True),
+    StructField("chunk", ArrayType(LongType()), nullable=True),
+    StructField("double_chunk", ArrayType(LongType()), nullable=True)
+])
 
 def get_all_7_char_chunks(h):
     return set((unpack("<Q", base64.b64decode(h[i:i+7] + "=") + b"\x00\x00\x00")[0] for i in range(len(h) - 6)))
 
-@F.pandas_udf('struct<chunksize:int,chunk:array<float>,double_chunk:array<float>>', F.PandasUDFType.GROUPED_MAP)
-def preprocess_hash(h):
-    block_size, h = h.split(":", 1)
-    block_size = int(block_size)
+# Use the pandas_udf decorator and the updated result schema
+@pandas_udf(result_schema, PandasUDFType.SCALAR)
+def preprocess_hash(h: pd.Series) -> pd.DataFrame:
+    def process_hash(h: str):
+        block_size, h = h.split(":", 1)
+        block_size = int(block_size)
 
-    # Reduce any sequence of the same char greater than 3 to 3
-    for c in set(list(h)):
-        while c * 4 in h:
-            h = h.replace(c * 4, c * 3)
+        # Reduce any sequence of the same char greater than 3 to 3
+        for c in set(list(h)):
+            while c * 4 in h:
+                h = h.replace(c * 4, c * 3)
 
-    block_data, double_block_data = h.split(":")
-    return (block_size, list(get_all_7_char_chunks(block_data)), list(get_all_7_char_chunks(double_block_data)))
+        block_data, double_block_data = h.split(":")
+        return (block_size, list(get_all_7_char_chunks(block_data)), list(get_all_7_char_chunks(double_block_data)))
+
+    # Apply the process_hash function to each element in the Series and convert the result into a DataFrame
+    result = h.apply(process_hash).apply(pd.Series)
+    result.columns = ["chunksize", "chunk", "double_chunk"]
+    return result
 
 
 def get_transformed_ssdeep_hash(df):
