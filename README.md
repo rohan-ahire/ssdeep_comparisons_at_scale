@@ -10,8 +10,6 @@ This Python project is an implementation of the article ["Optimizing SSDEEP for 
 - [Installation](#installation)
 - [Usage](#usage)
 - [Testing](#testing)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Introduction
 
@@ -75,7 +73,7 @@ This notebook extends the single value lookup functionality to support multiple 
 
 Notebook: [multi_value_lookup.py](./notebooks/multi_value_lookup.py)
 
-4. **Testing Accuracy and Completeness** - 
+## Testing
 This notebook demonstrates how to test the accuracy and completeness of the ssdeep comparisons. It compares the single value lookup methodology with a brute-force approach that performs a cross join between the input ssdeep hash and all ssdeep hashes in the database. The output consists of a comparison between the two methods, ensuring that all comparison results with a score greater than 0 are accurately captured. See the testing section of the below notebook.
 
 Notebook: [single_value_lookup.py](./notebooks/single_value_lookup.py)
