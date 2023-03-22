@@ -7,7 +7,7 @@ from struct import unpack
 def get_all_7_char_chunks(h):
     return set((unpack("<Q", base64.b64decode(h[i:i+7] + "=") + b"\x00\x00\x00")[0] for i in range(len(h) - 6)))
 
-@F.pandas_udf('struct<chunksize:int,chunk:array<float>,double_chunk:array<float>>', PandasUDFType.GROUPED_MAP)
+@F.pandas_udf('struct<chunksize:int,chunk:array<float>,double_chunk:array<float>>', F.PandasUDFType.GROUPED_MAP)
 def preprocess_hash(h):
     block_size, h = h.split(":", 1)
     block_size = int(block_size)
