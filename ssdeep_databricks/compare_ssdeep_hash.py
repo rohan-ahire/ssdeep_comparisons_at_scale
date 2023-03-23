@@ -21,6 +21,12 @@ def get_query_for_optimized_ssdeep_compare(df1: str, df2: str) -> str:
     """
     Generate SQL query to compare ssdeep hashes in an optimized way.
 
+    Both input dataframes need 3 input columns
+    - ssdeep_hash
+    - chunksize
+    - ngram_chunk_output
+    - ngram_double_chunk_output
+
     Parameters:
     df1 (str): The name of the first DataFrame to compare.
     df2 (str): The name of the second DataFrame to compare.
@@ -97,6 +103,9 @@ def get_query_ssdeep_all_possible_comparisons(df1: str, df2: str) -> str:
     """
     Generate SQL query to compare ssdeep hashes using all possible comparisons (brute force).
 
+    Both input dataframes needs the following column:
+    - ssdeep_hash
+
     Parameters:
     df1 (str): The name of the first DataFrame to compare.
     df2 (str): The name of the second DataFrame to compare.
@@ -120,6 +129,16 @@ def get_query_ssdeep_all_possible_comparisons(df1: str, df2: str) -> str:
 def get_query_to_compare_ssdeep_using_explode_and_join(a: str, b: str, c: str, d: str) -> str:
     """
     Generate SQL query to compare ssdeep hashes using explode and join.
+
+    Dataframes a and c need the following columns
+    - ssdeep_hash
+    - chunksize
+    - ngram_chunk_output_exploded
+
+    Dataframes b and d need the following columns
+    - ssdeep_hash
+    - chunksize
+    - ngram_double_chunk_output
 
     Parameters:
     a (str): The name of the dataframe containing exploded values for chunk

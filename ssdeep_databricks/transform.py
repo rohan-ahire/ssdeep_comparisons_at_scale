@@ -39,6 +39,10 @@ def preprocess_hash(h: pd.Series) -> pd.DataFrame:
 
 
 def get_transformed_ssdeep_hash(df):
+    """
+    Do not use this function.
+    This function is alternate way and only converts hash value to n gram substring arrays.
+    """
     df = (
         df.withColumn("chunksize", F.split(df["ssdeep_hash"], ":").getItem(0))
         .withColumn("chunk", F.split(df["ssdeep_hash"], ":").getItem(1))
