@@ -10,6 +10,8 @@ This Python project is an implementation of the article ["Optimizing SSDEEP for 
 - [Installation](#installation)
 - [Usage](#usage)
 - [Testing](#testing)
+- [Performance](#performance)
+- [Challenges](#challenges)
 
 ## Introduction
 
@@ -77,3 +79,35 @@ Notebook: [multi_value_lookup.py](./notebooks/multi_value_lookup.py)
 This notebook demonstrates how to test the accuracy and completeness of the ssdeep comparisons. It compares the single value lookup methodology with a brute-force approach that performs a cross join between the input ssdeep hash and all ssdeep hashes in the database. The output consists of a comparison between the two methods, ensuring that all comparison results with a score greater than 0 are accurately captured. See the testing section of the below notebook.
 
 Notebook: [single_value_lookup.py](./notebooks/single_value_lookup.py)
+
+
+## Performance
+
+The method from the article referenced here - https://www.virusbulletin.com/virusbulletin/2015/11/optimizing-ssdeep-use-scale offers a more efficient approach to comparing ssdeep hashes in Spark. Unlike the traditional m*n operation involving cross joins, which can be time-consuming and computationally intensive, this technique considerably reduces the number of comparisons needed. As a result, we can effectively identify all ssdeep hashes with a similarity score greater than 0. The underlying datasets have inherent skew to be true representtive of real world datasets.
+
+The table below demonstrates the performance improvements we've achieved in this iteration. As an initial attempt at applying this methodology in Spark, our work provides a valuable starting point for further exploration of ssdeep hash comparisons, which could ultimately facilitate clustering similar files.
+
+| Experiment | Node Type    | dbu per/hr | \# Nodes | Table A (# Rows - Corpus) | Table B (# Rows - Look up values) | Execution Time (mins) |
+| ---------- | ------------ | ---------- | -------- | ------------------------- | --------------------------------- | --------------------- |
+| 1          | i3.xlarge    | 12.96      | 1        | 20000000                  | 1                                 | 0.2                   |
+| 2          | i3.xlarge    | 20.96      | 5        | 20000000                  | 100                               | 1                     |
+| 3          | i3.xlarge    | 30.96      | 10       | 20000000                  | 1000                              | 3.5                   |
+| 4          | i3.xlarge    | 50.96      | 20       | 20000000                  | 10000                             | 15                    |
+| 5          | i3.xlarge    | 110.96     | 50       | 20000000                  | 100000                            | 72                    |
+| 6          | m5d.8x.large | 21.92      | 1        | 20000000                  | 1                                 | 0.5                   |
+| 7          | m5d.8x.large | 21.92      | 1        | 20000000                  | 100                               | 0.5                   |
+| 8          | m5d.8x.large | 21.92      | 1        | 20000000                  | 1000                              | 3                     |
+| 9          | m5d.8x.large | 65.76      | 5        | 20000000                  | 10000                             | 7                     |
+| 10         | m5d.8x.large | 175.36     | 15       | 20000000                  | 100000                            | 40                    |
+
+
+## Challenges
+
+While the method we've implemented offers significant improvements in ssdeep hash comparisons, there are a few challenges we've encountered along the way:
+
+ - **Broadcast Join** : The technique relies on using broadcast join, where we broadcast the smaller lookup table. It is essential to set the broadcast join threshold appropriately to accommodate the size of the smaller table.
+- **Skewed Join** : The join between the corpus and the lookup table can suffer if the underlying lookup table is highly skewed based on the chunk size join key. Skew can be addressed manually by salting the data or ensuring that the underlying tables are stored randomly, without any ordering based on the join key.
+- **Array Intersection** : This technique also relies on the array_intersect Spark SQL function. We compared it with an alternative approach involving exploding arrays and performing a join. However, array_intersect proved to be faster and consumed fewer resources. Additionally, the explode and join technique encountered more data skew issues than array_intersect, due to the variable size of chunk and double chunk arrays, which amplifies skew.
+- **Balancing Workload** : Our primary goal is to reduce processing time while using minimal resources (cost and time). A current challenge is to evenly distribute the workload across all Spark tasks, which would likely further decrease processing time.
+
+In summary, this work serves as a impactful first attempt at implementing this methodology in Spark. We acknowledge the challenges and strive to continuously improve our solution, making ssdeep hash comparisons more efficient and effective.
